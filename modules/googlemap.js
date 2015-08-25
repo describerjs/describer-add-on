@@ -14,7 +14,7 @@ define(['jquery', '_super', 'modules.onView'], function ($, _super, extendOjb){
 	var googlemap = $.extend({}, extendOjb, {
 		_on: function(e){
 			var that = this;
-			this._removeRenderFunctionFromExecRafObj();
+			this._removeRenderFunctionFromRafExecIterationObj();
 			require(['async!http://maps.googleapis.com/maps/api/js?key=AIzaSyB2oMRQW1_t9LYrErsj0G83xCvTtZiGoPI&sensor=false'], function(){
 				require(['config.googlemap'], function(_confic_map){
 					that.configMap = _confic_map.setup(google, that);

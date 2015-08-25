@@ -28,7 +28,7 @@ define(['jquery', '_super'], function ($, _super){
 			this.setProperties();
 			this.orientation = (window.innerHeight > window.innerWidth) ? 'p':'w';
 			$(window).on('resize', this.checkOrientation.bind(this));
-			$('body').on('dc-documentHeightChange', this.setProperties.bind(this));
+			$('body').on('dc-documentHeightChange dc-triggerLayout', this.setProperties.bind(this));
 		},
 
 		options: {
@@ -55,9 +55,9 @@ define(['jquery', '_super'], function ($, _super){
 		},
 
 		_exec: function(e){
-			var _viewportTop = window.dc.win.pageYOffset;
-			var _viewportBottom = _viewportTop + window.dc.win.innerHeight;
-			if(jmHF.hasClass(this.$destination[0], 'show')){
+			var _viewportTop = window.dc.raf.win.pageYOffset;
+			var _viewportBottom = _viewportTop + window.dc.raf.win.innerHeight;
+			if(dc.helper.hasClass(this.$destination[0], 'show')){
 				if(this.onlyTopOfElem){
 					if(_viewportBottom < this.eot + this.offsetTop){
 						this.$destination.removeClass('show');
