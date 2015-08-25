@@ -52,15 +52,24 @@ define(['jquery', 'actions.ajax', 'md5'], function ($, extendOjb, md5){
 		},
 
 		_createModal: function(){
-			this.$modal = $('<div id="'+this._getID()+'" class="mask">' +
-								'<div class="modal-bar">' +
-									'<a class="modal-close">Close</a>' +
-								'</div>' +
-								'<div class="modal">' +
-									'<div class="modal-dialog"></div>' +
-								'</div>' +
-							'</div>');
+			var _content;
+			this.$modal = $('' +
+				'<div id="'+this._getID()+'" class="mask">' +
+					'<div class="modal-bar">' +
+						'<a class="modal-close">Close</a>' +
+					'</div>' +
+					'<div class="modal">' +
+						'<div class="modal-dialog"></div>' +
+					'</div>' +
+				'</div>');
 			$('body').append(this.$modal);
+			if(this.is('data') !== ''){
+				_content = this._getModalContent();
+				this.$modal.find('.modal-dialog').append(_content);
+				this._finishing(_content);
+				window.requestAnimationFrame(this._open.bind(this));
+				return;
+			}
 			window.requestAnimationFrame(this._open.bind(this));
 			window.requestAnimationFrame(this._execAjax.bind(this));
 		},
@@ -68,6 +77,16 @@ define(['jquery', 'actions.ajax', 'md5'], function ($, extendOjb, md5){
 		_getID: function(){
 			// return ID or md5 hash for Modal-ID
 			return (this.$elem.attr('href').match(/^#(.*)/g)) ? this.$elem.attr('href').replace('#', '') : md5(this.$elem.attr('href'));
+		},
+
+		_getModalContent: function(){
+			var _execContent;
+			if(this.is('data').indexOf('##') !== -1){
+				_execContent = eval('this.'+ this.is('data').match(/##(.*)##/)[1]);
+				return $(this.is('data').replace(/##(.*)##/g, _execContent));
+			}else{
+				return $(this.is('data'));
+			}
 		},
 
 		_execAjax: function(){
@@ -79,11 +98,11 @@ define(['jquery', 'actions.ajax', 'md5'], function ($, extendOjb, md5){
 
 		_open: function(){
 			var that = this;
-			this.div = ((jmHF.getScrollPos()/$(document).height())*25)-50;
+			this.div = ((dc.helper.getScrollPos()/$(document).height())*25)-50;
 			this.$modal.find('.modal-dialog').css({'transform': 'translateY('+this.div+'%) rotateX(15deg)'});
 			this.$modal.css({
-				//'height': $(document).height(),
-				'padding-top': jmHF.getScrollPos()
+				'height': $(document).height(),
+				'padding-top': dc.helper.getScrollPos()
 			});
 
 			//			this.$modal.on('click', '.modal-close', function(e){
@@ -127,6 +146,9 @@ define(['jquery', 'actions.ajax', 'md5'], function ($, extendOjb, md5){
 			setTimeout(function(){
 				that.$modal.removeClass('close open');
 				$('.modal-legal').remove();
+				if(that.is('removeAfterClose')){
+					that.$modal.remove();
+				}
 			}, 800);
 		},
 
